@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Vane, Mi Reina 👑💖 | 1 Año Juntos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Dancing+Script:wght@600;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --gothic-dark: #0a0612;
+            --gothic-purple: #1e0b2b;
+            --corpse-blue: #1c3b57;
+            --fairy-pink: #ff85a2;
+            --fairy-glow: #ffaec0;
+            --royal-gold: #ffd700;
+            --card-bg: rgba(18, 10, 28, 0.75);
+            --border-glow: rgba(255, 133, 162, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--gothic-dark);
+            color: #f0e6f6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- Canvas de Animaciones de Fondo (Corazones y Hadas) --- */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* --- Audio Player Control Bar --- */
+        .audio-control-bar {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 1000;
+            background: rgba(15, 8, 25, 0.85);
+            border: 1px solid var(--fairy-pink);
+            padding: 8px 16px;
+            border-radius: 30px;
+            box-shadow: 0 0 15px rgba(255, 133, 162, 0.4);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .music-btn {
+            background: transparent;
+            border: none;
+            color: var(--fairy-pink);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        .music-btn:hover {
+            transform: scale(1.1);
+            color: var(--royal-gold);
+        }
+
+        .song-title {
+            font-size: 0.8rem;
+            color: #dfcbe8;
+            max-width: 140px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* --- Sidebar Navigation Menu --- */
+        .navbar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 70px;
+            background: rgba(10, 6, 18, 0.9);
+            border-right: 1px solid var(--border-glow);
+            z-index: 900;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 30px;
+            gap: 25px;
+            backdrop-filter: blur(10px);
+            transition: width 0.3s ease;
+        }
+
+        .nav-item {
+            color: #bfa5cb;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--fairy-pink);
+            background: rgba(255, 133, 162, 0.15);
+            box-shadow: 0 0 12px rgba(255, 133, 162, 0.3);
+            transform: scale(1.05);
+        }
+
+        .nav-item .tooltip {
+            position: absolute;
+            left: 65px;
+            background: var(--gothic-purple);
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            border: 1px solid var(--fairy-pink);
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .nav-item:hover .tooltip {
+            opacity: 1;
+        }
+
+        /* --- Main Content Area --- */
+        .main-container {
+            margin-left: 70px;
+            padding: 40px 20px;
+            min-height: 100vh;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- Section Container --- */
+        .content-section {
+            display: none;
+            width: 100%;
+            max-width: 900px;
+            animation: fadeIn 0.6s cubic-bezier(0.39, 0.575, 0.565, 1) forwards;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Header Special Banner --- */
+        .hero-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .crown-icon {
+            font-size: 3rem;
+            color: var(--royal-gold);
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+            animation: floatCrown 3s ease-in-out infinite;
+        }
+
+        @keyframes floatCrown {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(-3deg); }
+        }
+
+        .hero-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #ff85a2, #ffd700, #c9a0dc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 10px 0;
+            text-shadow: 0 0 20px rgba(255, 133, 162, 0.4);
+        }
+
+        .hero-subtitle {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            color: var(--fairy-glow);
+        }
+
+        /* --- Glassmorphic Card Styling --- */
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(255, 133, 162, 0.1);
+            backdrop-filter: blur(12px);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Cadaver de la Novia Theme Highlights --- */
+        .corpse-theme-box {
+            border-color: rgba(100, 180, 245, 0.4);
+            box-shadow: 0 0 25px rgba(28, 59, 87, 0.8), inset 0 0 15px rgba(100, 180, 245, 0.1);
+        }
+
+        .corpse-title {
+            font-family: 'Cinzel Decorative', serif;
+            color: #92c5eb;
+            text-shadow: 0 0 10px rgba(146, 197, 235, 0.5);
+        }
+
+        /* --- Gallery Grid --- */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .gallery-card {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid var(--border-glow);
+            height: 260px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(255, 133, 162, 0.4);
+        }
+
+        .gallery-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .gallery-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(transparent, rgba(10, 6, 18, 0.9));
+            color: #fff;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* --- Love Letters Content --- */
+        .letter-text {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #f3e6f8;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .signature {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.2rem;
+            color: var(--fairy-pink);
+            text-align: right;
+            margin-top: 25px;
+            text-shadow: 0 0 10px rgba(255, 133, 162, 0.5);
+        }
+
+        /* --- Liam Special Family Section --- */
+        .liam-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 20px;
+        }
+
+        .family-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid var(--royal-gold);
+            padding: 8px 20px;
+            border-radius: 30px;
+            color: var(--royal-gold);
+            font-weight: 600;
+        }
+
+        /* --- Iframe Modal for Saved Memories --- */
+        .iframe-container {
+            width: 100%;
+            height: 70vh;
+            border-radius: 15px;
+            border: 1px solid var(--fairy-pink);
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            background: #000;
+        }
+
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .memory-selector {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .memory-btn {
+            background: rgba(30, 11, 43, 0.8);
+            border: 1px solid var(--fairy-pink);
+            color: var(--fairy-glow);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .memory-btn.active, .memory-btn:hover {
+            background: var(--fairy-pink);
+            color: #000;
+            box-shadow: 0 0 15px rgba(255, 133, 162, 0.6);
+            transform: translateY(-2px);
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .navbar {
+                width: 100%;
+                height: 60px;
+                top: auto;
+                bottom: 0;
+                flex-direction: row;
+                justify-content: space-around;
+                padding-top: 0;
+                border-right: none;
+                border-top: 1px solid var(--border-glow);
+            }
+
+            .nav-item .tooltip {
+                display: none;
+            }
+
+            .main-container {
+                margin-left: 0;
+                padding-bottom: 80px;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.4rem;
+            }
+
+            .audio-control-bar {
+                top: 10px;
+                right: 10px;
+                padding: 6px 12px;
+            }
+
+            .song-title {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Animation Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Top Music Player Control -->
+    <div class="audio-control-bar">
+        <button class="music-btn" id="play-pause-btn" title="Reproducir / Pausar">
+            <i class="fas fa-music"></i>
+        </button>
+        <span class="song-title" id="song-title-display">Reproduciendo Música de Amor</span>
+        <button class="music-btn" id="next-song-btn" title="Siguiente Canción">
+            <i class="fas fa-forward"></i>
+        </button>
+    </div>
+
+    <!-- Background Audio Elements -->
+    <audio id="audio-player" loop>
+        <source src="remains_of_the_day.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Navigation Sidebar -->
+    <nav class="navbar">
+        <div class="nav-item active" onclick="showSection('hero')" title="Inicio">
+            <i class="fas fa-crown"></i>
+            <span class="tooltip">Mi Reina Vane</span>
+        </div>
+        <div class="nav-item" onclick="showSection('anniversary')" title="1 Año">
+            <i class="fas fa-heart"></i>
+            <span class="tooltip">1 Año Cumplido</span>
+        </div>
+        <div class="nav-item" onclick="showSection('corpse-bride')" title="Cadaver de la Novia">
+            <i class="fas fa-ring"></i>
+            <span class="tooltip">El Cádavre de la Novia</span>
+        </div>
+        <div class="nav-item" onclick="showSection('liam-family')" title="Nuestra Familia">
+            <i class="fas fa-child"></i>
+            <span class="tooltip">Vane & Liam</span>
+        </div>
+        <div class="nav-item" onclick="showSection('memories')" title="Regalos Especiales">
+            <i class="fas fa-gift"></i>
+            <span class="tooltip">Recordatorios HTML</span>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="main-container">
+
+        <!-- SECTION 1: HERO & WELCOME -->
+        <section id="hero" class="content-section active">
+            <div class="hero-header">
+                <div class="crown-icon"><i class="fas fa-crown"></i></div>
+                <h1 class="hero-title">Para la Reina de Mi Vida: Vane</h1>
+                <p class="hero-subtitle">✨ Un mundo mágico de amor, hadas y promesas eternas ✨</p>
+            </div>
+
+            <div class="glass-card">
+                <h2 style="font-family:'Dancing Script', cursive; font-size:2rem; color: var(--fairy-pink); margin-bottom:15px; text-align:center;">
+                    👑 ¡Feliz 1er Mes Cumplido de Nuestro Nuevo Capítulo & 1 Año de Amor Hermoso! 👑
+                </h2>
+                <p class="letter-text">
+                    Mi Vane hermosa, mi reina preciosa... Te preparé este espacio digital tan especial, único y cargado de magia para decirte lo absurdamente enamorado que estoy de ti. Hoy celebramos 1 mes oficial juntos en esta etapa tan bella, recordando también ese hermoso recorrido de 1 año entero donde has llenado mi existencia de luz, sonrisas y el calor de un hogar puro.
+                </p>
+                <p class="letter-text">
+                    Como en un cuento de hadas de noche estrellada, o como en la hermosa devoción eterna de <i>"El Cádavre de la Novia"</i> de Tim Burton, mi promesa contigo es real, profunda y de por vida. Eres la dueña absoluta de mi corazón.
+                </p>
+                <div class="signature">Con todo mi amor, Tu Búho 🦉💖</div>
+            </div>
+
+            <div class="gallery-grid">
+                <div class="gallery-card">
+                    <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop" alt="Hada Mágica">
+                    <div class="gallery-caption">✨ Mi Hada Encantada ✨</div>
+                </div>
+                <div class="gallery-card">
+                    <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=600&auto=format&fit=crop" alt="Noche Romántica de Cuento">
+                    <div class="gallery-caption">👑 Mi Reina Única 👑</div>
+                </div>
+                <div class="gallery-card">
+                    <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600&auto=format&fit=crop" alt="Corazón Encantado">
+                    <div class="gallery-caption">💖 Amor Eterno 💖</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: 1 AÑO CUMPLIDO -->
+        <section id="anniversary" class="content-section">
+            <div class="hero-header">
+                <i class="fas fa-heartbeat" style="font-size:2.5rem; color:var(--fairy-pink);"></i>
+                <h1 class="hero-title">1 Año de Historia & Amor Infinito</h1>
+                <p class="hero-subtitle">Cada segundo a tu lado es mi recuerdo favorito</p>
+            </div>
+
+            <div class="glass-card">
+                <p class="letter-text">
+                    Amor de mi vida, reflexionar sobre este año entero me hace agradecer infinitamente al destino por haberte puesto en mi camino. 
+                </p>
+                <p class="letter-text">
+                    Gracias por tu risa que sana cualquier día difícil, por tu paciencia, por tu cariño incondicional y por regalarme la dicha de llamarme tu pareja. Eres mi inspiración para ser mejor hombre cada día, para trabajar duro, programar mundos para ti y proteger el hermoso espacio que estamos construyendo.
+                </p>
+                <div style="text-align:center; margin: 25px 0;">
+                    <span style="font-size: 1.2rem; color: var(--royal-gold); background: rgba(255,215,0,0.1); padding: 10px 25px; border-radius: 30px; border: 1px solid var(--royal-gold);">
+                        💍 "Con esta mano sostendré tus anhelos, tu copa nunca estará vacía..." 💍
+                    </span>
+                </div>
+            </div>
+
+            <div class="gallery-grid">
+                <div class="gallery-card">
+                    <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=600&auto=format&fit=crop" alt="Manos juntas">
+                    <div class="gallery-caption">Unidad y Lealtad</div>
+                </div>
+                <div class="gallery-card">
+                    <img src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?q=80&w=600&auto=format&fit=crop" alt="Luces de Amor">
+                    <div class="gallery-caption">La Luz de Mis Días</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: CADÁVER DE LA NOVIA THEME -->
+        <section id="corpse-bride" class="content-section">
+            <div class="hero-header">
+                <i class="fas fa-ring" style="font-size:2.5rem; color:#92c5eb;"></i>
+                <h1 class="hero-title corpse-title">Emily & Victor: Amor Más Allá del Tiempo</h1>
+                <p class="hero-subtitle" style="color:#b2d8f5;">"Te amo, pero no eres mía... Tú me devolviste la vida"</p>
+            </div>
+
+            <div class="glass-card corpse-theme-box">
+                <p class="letter-text">
+                    Sé cuánto te fascina la estética y el sentimiento tan poético de <i>"El Cádavre de la Novia"</i>. Esa mezcla de romanticismo gótico, mariposas azules que se elevan hacia la luna y promesas que ni el tiempo ni la distancia pueden romper.
+                </p>
+                <p class="letter-text">
+                    Tú eres mi mariposa azul, la melodía en el piano de mi alma que ilumina la oscuridad con gracia y belleza pura. 
+                </p>
+                
+                <div class="gallery-grid" style="margin-top:25px;">
+                    <div class="gallery-card" style="border-color:#92c5eb;">
+                        <img src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600&auto=format&fit=crop" alt="Luna Gótica">
+                        <div class="gallery-caption">Bajo la Noche Azul</div>
+                    </div>
+                    <div class="gallery-card" style="border-color:#92c5eb;">
+                        <img src="https://images.unsplash.com/photo-1518895949257-7621c3c786d7?q=80&w=600&auto=format&fit=crop" alt="Mariposa Azul">
+                        <div class="gallery-caption">Mariposas Eternas 🦋</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: LIAM & NUESTRA FAMILIA -->
+        <section id="liam-family" class="content-section">
+            <div class="hero-header">
+                <i class="fas fa-heart" style="font-size:2.5rem; color:var(--royal-gold);"></i>
+                <h1 class="hero-title">Mi Reina Vane & El Pequeño Campeón Liam 👑👦🏻</h1>
+                <p class="hero-subtitle">El equipo más hermoso del universo</p>
+            </div>
+
+            <div class="glass-card liam-box">
+                <div class="family-badge">
+                    <i class="fas fa-crown"></i> Reina Vane & Príncipe Liam <i class="fas fa-star"></i>
+                </div>
+
+                <p class="letter-text">
+                    Vane mi amor, mi respeto y admiración por ti crecen cada día al ver lo increíble, amorosa y valiente madre que eres para tu hermoso hijo Liam. 
+                </p>
+                <p class="letter-text">
+                    Liam es una bendición tan grande y una luz gigante en tu vida. Quiero que sepas que él siempre tiene un lugar muy especial y cálido en mi corazón. Prometo estar siempre para apoyarlos a ambos, para cuidar sus sonrisas y para ser un pilar de alegría y seguridad para ustedes dos. ¡Los adoro con toda mi alma!
+                </p>
+
+                <div class="gallery-grid" style="width:100%;">
+                    <div class="gallery-card">
+                        <img src="https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?q=80&w=600&auto=format&fit=crop" alt="Amor de Familia">
+                        <div class="gallery-caption">Protección y Alegría Total</div>
+                    </div>
+                    <div class="gallery-card">
+                        <img src="https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=600&auto=format&fit=crop" alt="Estrellas y Magia">
+                        <div class="gallery-caption">Un Futuro Lleno de Magia 🌟</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: REGALOS HTML / MEMORIES -->
+        <section id="memories" class="content-section">
+            <div class="hero-header">
+                <i class="fas fa-box-open" style="font-size:2.5rem; color:var(--fairy-pink);"></i>
+                <h1 class="hero-title">Buscador de Recuerdos Digitales 🎁</h1>
+                <p class="hero-subtitle">Revive las cartas y flores especiales que te he reglado</p>
+            </div>
+
+            <div class="memory-selector">
+                <button class="memory-btn active" onclick="loadMemory('cumpleaños.html', this)">
+                    🎉 Cumpleaños Especial Vane
+                </button>
+                <button class="memory-btn" onclick="loadMemory('girasol.html', this)">
+                    🌻 Girasoles de Felicidad
+                </button>
+                <button class="memory-btn" onclick="loadMemory('Te_amo.html', this)">
+                    💖 Carta "Te Amo"
+                </button>
+            </div>
+
+            <div class="iframe-container">
+                <iframe id="memory-frame" src="cumpleaños.html"></iframe>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Scripting for Canvas, Audio Control and Navigation -->
+    <script>
+        // --- Navigation Control ---
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.content-section');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            sections.forEach(sec => sec.classList.remove('active'));
+            navItems.forEach(item => item.classList.remove('active'));
+
+            document.getElementById(sectionId).classList.add('active');
+
+            // Find matching nav item index
+            const indexMap = { 'hero': 0, 'anniversary': 1, 'corpse-bride': 2, 'liam-family': 3, 'memories': 4 };
+            if (navItems[indexMap[sectionId]]) {
+                navItems[indexMap[sectionId]].classList.add('active');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function loadMemory(fileUrl, btnElement) {
+            document.getElementById('memory-frame').src = fileUrl;
+            const btns = document.querySelectorAll('.memory-btn');
+            btns.forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+        }
+
+        // --- Audio Player Playlist Logic ---
+        const playlist = [
+            { title: "Cadaver de la Novia - Remains of the Day", src: "remains_of_the_day.mp3" },
+            { title: "Victor's Piano Solo - Cadaver de la Novia", src: "victors_piano_solo.mp3" },
+            { title: "Canción Romántica de Amor", src: "cancion_amor.mp3" }
+        ];
+
+        let currentSongIndex = 0;
+        const audioPlayer = document.getElementById('audio-player');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const songTitleDisplay = document.getElementById('song-title-display');
+        const nextSongBtn = document.getElementById('next-song-btn');
+
+        function updateAudioSource() {
+            audioPlayer.src = playlist[currentSongIndex].src;
+            songTitleDisplay.textContent = playlist[currentSongIndex].title;
+        }
+
+        playPauseBtn.addEventListener('click', () => {
+            if (audioPlayer.paused) {
+                audioPlayer.play().then(() => {
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                }).catch(err => {
+                    console.log("Autoplay blocked, user interaction required:", err);
+                });
+            } else {
+                audioPlayer.pause();
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            }
+        });
+
+        nextSongBtn.addEventListener('click', () => {
+            currentSongIndex = (currentSongIndex + 1) % playlist.length;
+            updateAudioSource();
+            audioPlayer.play();
+            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        });
+
+        // Initialize audio source
+        updateAudioSource();
+
+        // --- Background Canvas Animation: Floating Hearts, Fairies & Sparkles ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const particles = [];
+        const particleCount = 45;
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = height + Math.random() * 100;
+                this.size = Math.random() * 12 + 8;
+                this.speedY = Math.random() * 1.2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.8;
+                this.opacity = Math.random() * 0.7 + 0.3;
+                this.type = Math.random() > 0.4 ? 'heart' : (Math.random() > 0.5 ? 'fairy' : 'sparkle');
+                this.angle = Math.random() * Math.PI * 2;
+                this.spin = (Math.random() - 0.5) * 0.02;
+            }
+
+            update() {
+                this.y -= this.speedY;
+                this.x += Math.sin(this.angle) * 0.5;
+                this.angle += 0.02;
+                this.spin += 0.01;
+
+                if (this.y < -30) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.globalAlpha = this.opacity;
+
+                if (this.type === 'heart') {
+                    ctx.fillStyle = '#ff85a2';
+                    ctx.font = `${this.size}px Arial`;
+                    ctx.fillText('💖', 0, 0);
+                } else if (this.type === 'fairy') {
+                    ctx.fillStyle = '#ffd700';
+                    ctx.font = `${this.size}px Arial`;
+                    ctx.fillText('✨', 0, 0);
+                } else {
+                    ctx.fillStyle = '#c9a0dc';
+                    ctx.font = `${this.size}px Arial`;
+                    ctx.fillText('🦋', 0, 0);
+                }
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateCanvas);
+        }
+
+        animateCanvas();
+    </script>
+</body>
+</html>
