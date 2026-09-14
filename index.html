@@ -462,10 +462,10 @@
 
             <div class="glass-card">
                 <h2 style="font-family:'Dancing Script', cursive; font-size:2rem; color: var(--fairy-pink); margin-bottom:15px; text-align:center;">
-                    👑 ¡Feliz 1er Mes Cumplido de Nuestro Nuevo Capítulo & 1 Año de Amor Hermoso! 👑
+                    👑 ¡Feliz 1er Año de Amor Hermoso! 👑
                 </h2>
                 <p class="letter-text">
-                    Mi Vane hermosa, mi reina preciosa... Te preparé este espacio digital tan especial, único y cargado de magia para decirte lo absurdamente enamorado que estoy de ti. Hoy celebramos 1 mes oficial juntos en esta etapa tan bella, recordando también ese hermoso recorrido de 1 año entero donde has llenado mi existencia de luz, sonrisas y el calor de un hogar puro.
+                    Mi Vane hermosa, mi reina preciosa... Te preparé este espacio digital tan especial, único y cargado de magia para decirte lo absurdamente enamorado que estoy de ti. Hoy celebramos 1 año entero juntos donde has llenado mi existencia de luz, sonrisas y el calor de un hogar puro.
                 </p>
                 <p class="letter-text">
                     Como en un cuento de hadas de noche estrellada, o como en la hermosa devoción eterna de <i>"El Cádavre de la Novia"</i> de Tim Burton, mi promesa contigo es real, profunda y de por vida. Eres la dueña absoluta de mi corazón.
@@ -674,7 +674,7 @@
 
         // Control Manual: Play / Pausa
         playPauseBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Evita conflicto con el clic de la página
+            e.stopPropagation(); 
             if (audioPlayer.paused) {
                 audioPlayer.play();
                 playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
@@ -700,8 +700,7 @@
         // Cargar primera canción
         playTrack(currentSongIndex);
 
-        // --- SOLUCIÓN PARA AUTOPLAY AL TOCAR/ABRIR ---
-        // Al dar el primer toque o clic en cualquier parte de la pantalla, la música arranca automáticamente
+        // --- AUTOPLAY AL TOCAR / HACER CLIC EN CUALQUIER PARTE ---
         const startAudioOnTouch = () => {
             if (audioPlayer.paused) {
                 audioPlayer.play().then(() => {
