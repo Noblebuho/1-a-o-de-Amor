@@ -414,18 +414,16 @@
     <!-- Top Music Player Control -->
     <div class="audio-control-bar">
         <button class="music-btn" id="play-pause-btn" title="Reproducir / Pausar">
-            <i class="fas fa-music"></i>
+            <i class="fas fa-play"></i>
         </button>
-        <span class="song-title" id="song-title-display">Reproduciendo Música de Amor</span>
+        <span class="song-title" id="song-title-display">Cargando música...</span>
         <button class="music-btn" id="next-song-btn" title="Siguiente Canción">
             <i class="fas fa-forward"></i>
         </button>
     </div>
 
-    <!-- Background Audio Elements -->
-    <audio id="audio-player" loop>
-        <source src="remains_of_the_day.mp3" type="audio/mpeg">
-    </audio>
+    <!-- Background Audio Element -->
+    <audio id="audio-player"></audio>
 
     <!-- Navigation Sidebar -->
     <nav class="navbar">
@@ -626,7 +624,6 @@
 
             document.getElementById(sectionId).classList.add('active');
 
-            // Find matching nav item index
             const indexMap = { 'hero': 0, 'anniversary': 1, 'corpse-bride': 2, 'liam-family': 3, 'memories': 4 };
             if (navItems[indexMap[sectionId]]) {
                 navItems[indexMap[sectionId]].classList.add('active');
@@ -642,15 +639,19 @@
         }
 
         // --- Audio Player Playlist Logic ---
-        const playlist = [{ 
-			title: "Cadaver de la Novia - Remains of the Day", 
-			src: "https://raw.githubusercontent.com/Noblebuho/1-a-o-de-Amor/refs/heads/main/Remains%20of%20the%20day.mp3" },
-		{ 
-        title: "Victor's Piano Solo - Cadaver de la Novia", 
-        src: "https://raw.githubusercontent.com/Noblebuho/1-a-o-de-Amor/refs/heads/main/Victor's%20Piano%20Solo.mp3" }, 
-		{ 
-        title: "La Seine - Un Monstruo en París", 
-        src: "https://raw.githubusercontent.com/Noblebuho/1-a-o-de-Amor/refs/heads/main/La%20Seine%20Un%20Monstruo%20en%20Par%C3%ADs%20.mp3" }
+        const playlist = [
+            { 
+                title: "Cadaver de la Novia - Remains of the Day", 
+                src: "https://raw.githubusercontent.com/Noblebuho/1-a-o-de-Amor/refs/heads/main/Remains%20of%20the%20day.mp3" 
+            },
+            { 
+                title: "Victor's Piano Solo - Cadaver de la Novia", 
+                src: "https://raw.githubusercontent.com/Noblebuho/1-a-o-de-Amor/refs/heads/main/Victor's%20Piano%20Solo.mp3" 
+            }, 
+            { 
+                title: "La Seine - Un Monstruo en París", 
+                src: "https://raw.githubusercontent.com/Noblebuho/1-a-o-de-Amor/refs/heads/main/La%20Seine%20Un%20Monstruo%20en%20Par%C3%ADs%20.mp3" 
+            }
         ];
 
         let currentSongIndex = 0;
@@ -659,33 +660,60 @@
         const songTitleDisplay = document.getElementById('song-title-display');
         const nextSongBtn = document.getElementById('next-song-btn');
 
-        function updateAudioSource() {
+        function playTrack(index) {
+            currentSongIndex = index;
             audioPlayer.src = playlist[currentSongIndex].src;
             songTitleDisplay.textContent = playlist[currentSongIndex].title;
+            
+            audioPlayer.play().then(() => {
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            }).catch(err => {
+                console.log("Autoplay bloqueado por el navegador hasta que toque la pantalla:", err);
+            });
         }
 
-        playPauseBtn.addEventListener('click', () => {
+        // Control Manual: Play / Pausa
+        playPauseBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Evita conflicto con el clic de la página
             if (audioPlayer.paused) {
-                audioPlayer.play().then(() => {
-                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                }).catch(err => {
-                    console.log("Autoplay blocked, user interaction required:", err);
-                });
+                audioPlayer.play();
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
             } else {
                 audioPlayer.pause();
                 playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
             }
         });
 
-        nextSongBtn.addEventListener('click', () => {
+        // Control Manual: Siguiente canción
+        nextSongBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             currentSongIndex = (currentSongIndex + 1) % playlist.length;
-            updateAudioSource();
-            audioPlayer.play();
-            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            playTrack(currentSongIndex);
         });
 
-        // Initialize audio source
-        updateAudioSource();
+        // Pasar automáticamente a la siguiente cuando termine la canción actual
+        audioPlayer.addEventListener('ended', () => {
+            currentSongIndex = (currentSongIndex + 1) % playlist.length;
+            playTrack(currentSongIndex);
+        });
+
+        // Cargar primera canción
+        playTrack(currentSongIndex);
+
+        // --- SOLUCIÓN PARA AUTOPLAY AL TOCAR/ABRIR ---
+        // Al dar el primer toque o clic en cualquier parte de la pantalla, la música arranca automáticamente
+        const startAudioOnTouch = () => {
+            if (audioPlayer.paused) {
+                audioPlayer.play().then(() => {
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                }).catch(() => {});
+            }
+            document.removeEventListener('click', startAudioOnTouch);
+            document.removeEventListener('touchstart', startAudioOnTouch);
+        };
+
+        document.addEventListener('click', startAudioOnTouch);
+        document.addEventListener('touchstart', startAudioOnTouch);
 
         // --- Background Canvas Animation: Floating Hearts, Fairies & Sparkles ---
         const canvas = document.getElementById('bg-canvas');
